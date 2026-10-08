@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume Forge</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="bar">
+  <h1>Resume&nbsp;Forge</h1>
+  <nav class="steps" role="tablist">
+    <button class="step" data-step="1" role="tab" aria-selected="true">1&nbsp;Job</button>
+    <button class="step" data-step="2" role="tab" aria-selected="false">2&nbsp;Profile</button>
+    <button class="step" data-step="3" role="tab" aria-selected="false">3&nbsp;Draft</button>
+    <button class="step" data-step="4" role="tab" aria-selected="false">4&nbsp;Export</button>
+  </nav>
+  <span class="badge" id="statusBadge" hidden></span>
+</header>
+
+<p class="nudge">
+  A referral or a direct introduction to the recruiter is worth more than any
+  keyword strategy — it goes around the filter entirely. Send one before you
+  apply, not after.
+</p>
+
+<main>
+
+<!-- ── 1. JOB ───────────────────────────────────────────���───────── -->
+<section class="panel" id="panel-1">
+  <h2>1 · The job</h2>
+  <p class="lede">Paste the posting, fetch a URL, or upload the JD as a
+    <code>.txt</code> or <code>.docx</code>.</p>
+
+  <div class="row">
+    <input type="url" id="jdUrl" placeholder="https://…  then Fetch" aria-label="Job posting URL">
+    <button id="fetchBtn" class="ghost">Fetch</button>
+  </div>
+
+  <textarea id="jdText" rows="12" spellcheck="false"
+    placeholder="Minimum Qualifications&#10;- 5+ years of experience with Python and PostgreSQL&#10;- Production Kubernetes experience&#10;&#10;Preferred&#10;- GraphQL a plus"></textarea>
+
+  <div class="row">
+    <label class="filebtn">Upload .txt / .docx
+      <input type="file" id="jdFile" accept=".txt,.docx" hidden>
+    </label>
+    <button id="parseBtn" class="primary">Extract requirements</button>
+  </div>
+
+  <div id="parseOut" class="out" hidden>
+    <h3>Requirements found <span class="count" id="reqCount"></span></h3>
+    <p class="hint">Check these. This is a first pass — delete anything spurious,
+      add anything it missed. Editing here changes what the matcher looks for.</p>
+    <p class="hint learned" id="archiveNote"></p>
+    <div id="reqList" class="reqlist"></div>
+    <button id="toProfile" class="primary">Next: profile &amp; match →</button>
+  </div>
+
+  <div id="learnBox" class="learnbox" hidden>
+    <h3>What your archive already knows</h3>
+    <div id="learnBody"></div>
+  </div>
+</section>
+
+<!-- ── 2. PROFILE ─────────────────────────────────────────────────── -->
+<section class="panel" id="panel-2" hidden>
+  <h2>2 · Your experience</h2>
+  <p class="lede">This is the only source of truth. Everything in the resume
+    comes from here, so gaps you leave are gaps the tool will report rather than
+    invent.</p>
+
+  <textarea id="profileText" rows="20" spellcheck="false"
+    placeholder="Start with a template — it has the section names the matcher understands."></textarea>
+  <div class="row">
+    <button id="loadTpl" class="ghost">Load template</button>
+    <button id="matchBtn" class="primary">Save &amp; match</button>
+  </div>
+
+  <div id="matchOut" class="out" hidden>
+    <h3>Match <span class="count" id="matchCounts"></span></h3>
+    <div id="openItems"></div>
+    <details id="fullMatrix">
+      <summary>Show every requirement</summary>
+      <div id="matrixRows"></div>
+    </details>
+    <button id="toDraft" class="primary">Next: draft →</button>
+  </div>
+</section>
+
+<!-- ── 3. DRAFT ──────────────────────────────────────────────────── -->
+<section class="panel" id="panel-3" hidden>
+  <h2>3 · Draft</h2>
+  <p class="lede">One AI call turns your profile into bullets. It cannot add a
+    claim you did not make; numbers it cannot source come back marked
+    <code>[confirm: …]</code>.</p>
+
+  <button id="tailorBtn" class="primary">Draft from my profile</button>
+  <div id="tailorStatus" class="status" hidden></div>
+
+  <div id="warnBox" class="warnbox" hidden>
+    <h3>Read this before sending</h3>
+    <div id="warnList"></div>
+  </div>
+
+  <div id="draftOut" hidden>
+    <label class="fieldlabel" for="draftMd">Resume (editable markdown)</label>
+    <textarea id="draftMd" rows="26" spellcheck="true"></textarea>
+    <div class="row">
+      <button id="relintBtn" class="ghost">Re-check</button>
+      <button id="toExport" class="primary">Next: export →</button>
+    </div>
+  </div>
+
+  <details class="fallback">
+    <summary>No API key? Paste a draft in.</summary>
+    <p class="hint">Anything you paste here is linted and exported identically.
+      Nothing is sent anywhere.</p>
+    <textarea id="manualDraft" rows="14" spellcheck="true"
+      placeholder="# Your Name&#10;email@… | phone | city&#10;&#10;## Summary&#10;…"></textarea>
+    <button id="useManual" class="ghost">Use this draft</button>
+  </details>
+</section>
+
+<!-- ── 4. EXPORT ─────────────────────────────────────────────────── -->
+<section class="panel" id="panel-4" hidden>
+  <h2>4 · Check &amp; export</h2>
+
+  <div id="lintBox">
+    <h3>Checks <span class="count" id="lintCount"></span></h3>
+    <p class="hint">Named failures with the fix, not a score. A self-scored
+      number would imply fidelity to a filter this tool cannot simulate.</p>
+    <div id="violations"></div>
+  </div>
+
+  <div class="row">
+    <button id="downloadDocx" class="primary">Download .docx</button>
+    <button id="downloadPdf" class="primary">Download .pdf</button>
+    <button id="printPdf" class="ghost">Print / Save as PDF</button>
+    <button id="copyMd" class="ghost">Copy markdown</button>
+    <button id="downloadTxt" class="ghost">Plain text self-test</button>
+  </div>
+  <div id="exportStatus" class="status" hidden></div>
+
+  <div id="outcomeBox" class="learnbox" hidden>
+    <h3>How did this one go?</h3>
+    <p class="hint">This is the only thing that makes the archive worth
+      anything. An interview tells the tool which terms the market actually
+      confirms about you; a rejection tells it which to distrust.</p>
+    <div class="row" id="outcomeBtns"></div>
+    <div id="outcomeNote" class="status" hidden></div>
+  </div>
+</section>
+
+</main>
+
+<!-- print surface: what the PDF dialog renders -->
+<article id="printSheet" aria-hidden="true"></article>
+
+<script src="/app.js"></script>
+</body>
+</html>
