@@ -1,7 +1,16 @@
+# Your real career facts and posting archive never get committed.
 profile.md
 data/
 exports/
+
+# Generated exports. Ignored by default so a real resume.docx or a downloaded
+# ATS PDF cannot be committed by accident, with the fictional sample outputs
+# pulled back in below.
 *.docx
 *.pdf
+!sample/profile.md
+!sample/*.docx
+!sample/*.pdf
+
 __pycache__/
 .env
